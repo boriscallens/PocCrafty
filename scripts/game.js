@@ -1,11 +1,32 @@
-var boxWidth = 32;
-var boxHeight = 32;
-var boardLeft = 0;
-var boardTop = 0;
-var boardCols = 10;
-var boardRows = 8;
-
-window.onload = (function () {
+$(function () {
     Crafty.init();
-    Crafty.e("TiledLevel").tiledLevel("./maps/grassAndWater.json", "DOM");
+    var map = Crafty.e("tiled");
+
+    map.loadMapFile("maps/test.tmx", function () {
+        createSprites(map.sprites);
+    });
+
+    function createSprites(sprites) {
+        var sprite;
+        for (var i = 0; i < sprites.length; i++) {
+            sprite = sprites[i];
+            //Crafty.sprite(sprite.imagePath, sprite.spriteWidth, sprite.spriteHeight, sprite.sprites, 0, 0, 0, 0);
+            Crafty.sprite(64, 128, sprite.imagePath, sprite.sprites, 0, 0);
+        }
+
+        var tile = Crafty.e("2D", "DOM", "1");
+        var iso = Crafty.diamondIso.init(64, 32, 3, 3);
+        iso.place(tile, 2, 2, 0);
+    };
 });
+
+
+
+String.prototype.format = function () {
+    var args = arguments;
+    return this.replace(/{(\d+)}/g, function (match, number) {
+        return typeof args[number] != 'undefined'
+      ? args[number]
+      : match;
+    });
+};

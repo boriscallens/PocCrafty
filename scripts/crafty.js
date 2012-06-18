@@ -57,7 +57,7 @@
 	noSetter,
 
 	loops = 0,
-  milliSecPerFrame = 1000 / FPS,
+    milliSecPerFrame = 1000 / FPS,
 	nextGameTick = (new Date).getTime(),
 
 	slice = Array.prototype.slice,
@@ -2349,14 +2349,14 @@ Crafty.c("Gravity", {
 * new Crafty.polygon([[50,0],[100,100],[0,100]]);
 * ~~~
 */
-Crafty.polygon = function (poly) {
+Crafty.Polygon = function (poly) {
 	if (arguments.length > 1) {
 		poly = Array.prototype.slice.call(arguments, 0);
 	}
 	this.points = poly;
 };
 
-Crafty.polygon.prototype = {
+Crafty.Polygon.prototype = {
 	/**@
 	* #.containsPoint
 	* @comp Crafty.Polygon
@@ -2589,7 +2589,7 @@ Crafty.c("Collision", {
 
 		//if no polygon presented, create a square
 		if (!poly) {
-			poly = new Crafty.polygon([0, 0], [area._w, 0], [area._w, area._h], [0, area._h]);
+			poly = new Crafty.Polygon([0, 0], [area._w, 0], [area._w, area._h], [0, area._h]);
 		}
 		this.map = poly;
 		this.attach(this.map);
@@ -4741,7 +4741,7 @@ Crafty.c("Mouse", {
 		if (arguments.length > 1) {
 			//convert args to array to create polygon
 			var args = Array.prototype.slice.call(arguments, 0);
-			poly = new Crafty.polygon(args);
+			poly = new Crafty.Polygon(args);
 		}
 
 		poly.shift(this._x, this._y);
