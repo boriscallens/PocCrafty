@@ -2,8 +2,10 @@ Crafty.c("tiled", {
     path: "",
     directory: "",
     sprites: [],
+    tiles: [],
     content: {},
     tilesetsLeftToParse: 0,
+    layersLeftToParse: 0,
     loadMapFile: function (tmxPath, callback) {
         var map = this;
 
@@ -11,6 +13,7 @@ Crafty.c("tiled", {
             console.log("onTmxLoaded", tmx);
             map.content = tmx;
             map.parseSprites();
+            map.parseLayers();
         });
         $(Crafty).bind('onTsxLoaded', function (event, tsx, firstSpriteId) {
             var tiles = map.loadSpriteSet($(tsx).find('tileset'), firstSpriteId);
@@ -18,9 +21,9 @@ Crafty.c("tiled", {
             map.tilesetsLeftToParse--;
             $(Crafty).trigger('onMapLoaded');
         });
-
         $(Crafty).bind('onMapLoaded', function () {
-            if (map.tilesetsLeftToParse <= 0) {
+            // if all tilesets and layers are loaded
+            if (map.tilesetsLeftToParse <= 0 && map.layersLeftToParse <= 0) {
                 callback();
             }
         });
@@ -63,6 +66,33 @@ Crafty.c("tiled", {
         $(Crafty).trigger('onMapLoaded');
         return null;
     },
+    parseLayers: function (aLayer) {
+        var map = this;
+        var layers = $(map.content).find('layer');
+        map.layersLeftToParse = layers.length;
+        layers.each(function () {
+            var layer = $(this);
+            var cols = layer.attr('width');
+            var rows = layer.attr('height');
+            var tileCounter = 0;
+            var names = layer.find('data').text().replace(/[\r\n]+/gm, "").split(",");
+            for (var col = 0; col < cols; col++) {
+                for (var row = 0; row < rows; row++) {
+                    console.log("col, row, name", col, row, names[tileCounter]);
+                    var tile = {
+                        x: col,
+                        y: row,
+                        name: names[tileCounter]
+                    };
+                    map.tiles.push(tile);
+                    tileCounter++;
+                }
+            }
+            map.layersLeftToParse--;
+            $(Crafty).trigger('onMapLoaded');
+        });
+
+    },
     loadSpriteSet: function (aSpriteSet, firstSpriteId) {
         var map = this;
         if (map.shouldIgnoreSpriteSet(aSpriteSet)) return null;
@@ -70,7 +100,7 @@ Crafty.c("tiled", {
         //var name = aSpriteSet.attr("name");
         var spriteWidth = aSpriteSet.attr('tilewidth');
         var spriteHeight = aSpriteSet.attr('tileheight');
-        if(!firstSpriteId) firstSpriteId = aSpriteSet.attr('firstgid');
+        if (!firstSpriteId) firstSpriteId = aSpriteSet.attr('firstgid');
         var imagePath = map.directory + aSpriteSet.find('image').attr('source');
         var imageWidth = aSpriteSet.find('image').attr("width");
         var imageHeight = aSpriteSet.find('image').attr("height");
@@ -96,23 +126,6 @@ Crafty.c("tiled", {
                 firstSpriteId++;
             }
         }
-        //console.log("16", sprites.16);
-        //        return {
-        //            16: [0, 0],
-        //            17: [1, 0],
-        //            18: [2, 0],
-        //            19: [3, 0],
-        //            20: [4, 0],
-        //            21: [5, 0],
-        //            22: [6, 0],
-        //            23: [7, 0],
-        //            24: [8, 0],
-        //            25: [9, 0],
-        //            26: [10, 0],
-        //            27: [11, 0],
-        //            28: [12, 0],
-        //            29: [13, 0]
-        //        };
         return sprites;
     }
 });

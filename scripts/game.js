@@ -4,6 +4,7 @@ $(function () {
 
     map.loadMapFile("maps/test.tmx", function () {
         createSprites(map.sprites);
+        createMap(map.tiles);
     });
 
     function createSprites(sprites) {
@@ -13,14 +14,17 @@ $(function () {
             //Crafty.sprite(sprite.imagePath, sprite.spriteWidth, sprite.spriteHeight, sprite.sprites, 0, 0, 0, 0);
             Crafty.sprite(64, 128, sprite.imagePath, sprite.sprites, 0, 0);
         }
-
-        var tile = Crafty.e("2D", "DOM", "1");
-        var iso = Crafty.diamondIso.init(64, 32, 3, 3);
-        iso.place(tile, 2, 2, 0);
     };
+    function createMap(tiles) {
+        var tile;
+        var iso = Crafty.diamondIso.init(64, 32, 3, 3);
+        for (var i = 0; i < tiles.length; i++) {
+            tile = tiles[i];
+            console.log(tile);
+            iso.place(Crafty.e("2D", "DOM", tile.name), tile.x, tile.y, tile.z);
+        }
+    }
 });
-
-
 
 String.prototype.format = function () {
     var args = arguments;
