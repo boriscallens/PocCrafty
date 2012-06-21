@@ -6,6 +6,7 @@ Crafty.c("tiled", {
     content: {},
     tilesetsLeftToParse: 0,
     layersLeftToParse: 0,
+
     loadMapFile: function (tmxPath, callback) {
         var map = this;
 
@@ -66,7 +67,7 @@ Crafty.c("tiled", {
         $(Crafty).trigger('onMapLoaded');
         return null;
     },
-    parseLayers: function (aLayer) {
+    parseLayers: function () {
         var map = this;
         var layers = $(map.content).find('layer');
         map.layersLeftToParse = layers.length;
@@ -76,8 +77,8 @@ Crafty.c("tiled", {
             var rows = layer.attr('height');
             var tileCounter = 0;
             var names = layer.find('data').text().replace(/[\r\n]+/gm, "").split(",");
-            for (var col = 0; col < cols; col++) {
-                for (var row = 0; row < rows; row++) {
+            for (var row = 0; row < rows; row++) {
+                for (var col = 0; col < cols; col++) {
                     console.log("col, row, name", col, row, names[tileCounter]);
                     var tile = {
                         x: col,
@@ -104,11 +105,12 @@ Crafty.c("tiled", {
         var imagePath = map.directory + aSpriteSet.find('image').attr('source');
         var imageWidth = aSpriteSet.find('image').attr("width");
         var imageHeight = aSpriteSet.find('image').attr("height");
+        var sprites = map.getSprites(firstSpriteId, imageWidth, imageHeight, spriteWidth, spriteHeight);
         return {
             imagePath: imagePath,
             spriteWidth: spriteWidth,
             spriteHeight: spriteHeight,
-            sprites: map.getSprites(firstSpriteId, imageWidth, imageHeight, spriteWidth, spriteHeight)
+            sprites: sprites
         };
     },
     shouldIgnoreSpriteSet: function (aSpriteSet) {
@@ -117,11 +119,11 @@ Crafty.c("tiled", {
     },
     getSprites: function (firstSpriteId, imageWidth, imageHeight, spriteWidth, spriteHeight) {
         var sprites = {};
-        var numberOfColumns = (imageWidth / spriteWidth);
+        var numberOfColumns = imageWidth / spriteWidth;
         var numberOfRows = imageHeight / spriteHeight;
-
-        for (var col = 0; col < numberOfColumns; col++) {
-            for (var row = 0; row < numberOfRows; row++) {
+        
+        for (var row = 0; row < numberOfRows; row++) {
+            for (var col = 0; col < numberOfColumns; col++) {
                 sprites[firstSpriteId] = [col, row];
                 firstSpriteId++;
             }

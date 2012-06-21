@@ -12,16 +12,15 @@ $(function () {
         for (var i = 0; i < sprites.length; i++) {
             sprite = sprites[i];
             //Crafty.sprite(sprite.imagePath, sprite.spriteWidth, sprite.spriteHeight, sprite.sprites, 0, 0, 0, 0);
-            Crafty.sprite(64, 128, sprite.imagePath, sprite.sprites, 0, 0);
+            Crafty.sprite(64, 64, sprite.imagePath, sprite.sprites, 0, 0);
         }
     };
     function createMap(tiles) {
         var tile;
         var iso = Crafty.diamondIso.init(64, 32, 3, 3);
         for (var i = 0; i < tiles.length; i++) {
-            tile = tiles[i];
-            console.log(tile);
-            iso.place(Crafty.e("2D", "DOM", tile.name), tile.x, tile.y, tile.z);
+            tile = map.tiles[i];
+            iso.place(Crafty.e("2D", "DOM", tile.name), tile.x, tile.y);
         }
     }
 });
