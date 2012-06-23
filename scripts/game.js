@@ -2,16 +2,18 @@ $(function () {
     Crafty.init();
     var map = Crafty.e("tiled");
 
-    map.loadMapFile("maps/test.tmx", function () {
+    map.loadMapFile("maps/frontier_outpost.tmx", function () {
+        //map.loadMapFile("maps/test.tmx", function () {
         createSprites(map.sprites);
         createMap(map.tiles);
     });
 
     function createSprites(sprites) {
         var sprite;
+        console.log("Sprite image", map.sprites);
+
         for (var i = 0; i < sprites.length; i++) {
             sprite = sprites[i];
-            //Crafty.sprite(sprite.imagePath, sprite.spriteWidth, sprite.spriteHeight, sprite.sprites, 0, 0, 0, 0);
             Crafty.sprite(64, 64, sprite.imagePath, sprite.sprites, 0, 0);
         }
     };

@@ -4,21 +4,22 @@ Crafty.c("tiled", {
     sprites: [],
     tiles: [],
     content: {},
-    tilesetsLeftToParse: 0,
-    layersLeftToParse: 0,
+    tilesetsLeftToParse: 9999,
+    layersLeftToParse: 9999,
 
     loadMapFile: function (tmxPath, callback) {
         var map = this;
 
         $(Crafty).bind('onTmxLoaded', function (event, tmx) {
-            console.log("onTmxLoaded", tmx);
+            //console.log("onTmxLoaded", tmx);
             map.content = tmx;
             map.parseSprites();
             map.parseLayers();
         });
         $(Crafty).bind('onTsxLoaded', function (event, tsx, firstSpriteId) {
-            var tiles = map.loadSpriteSet($(tsx).find('tileset'), firstSpriteId);
-            map.sprites.push(tiles);
+            //find the tileset in root or childnode
+            var tiles = map.loadSpriteSet($(tsx).filter('tileset').add($(tsx).find('tileset')), firstSpriteId);
+            if (tiles != null) map.sprites.push(tiles);
             map.tilesetsLeftToParse--;
             $(Crafty).trigger('onMapLoaded');
         });
@@ -79,7 +80,7 @@ Crafty.c("tiled", {
             var names = layer.find('data').text().replace(/[\r\n]+/gm, "").split(",");
             for (var row = 0; row < rows; row++) {
                 for (var col = 0; col < cols; col++) {
-                    console.log("col, row, name", col, row, names[tileCounter]);
+                    //console.log("col, row, name", col, row, names[tileCounter]);
                     var tile = {
                         x: col,
                         y: row,
@@ -101,11 +102,17 @@ Crafty.c("tiled", {
         //var name = aSpriteSet.attr("name");
         var spriteWidth = aSpriteSet.attr('tilewidth');
         var spriteHeight = aSpriteSet.attr('tileheight');
-        if (!firstSpriteId) firstSpriteId = aSpriteSet.attr('firstgid');
-        var imagePath = map.directory + aSpriteSet.find('image').attr('source');
+        var imageFilename = aSpriteSet.find('image').attr('source'); ;
+        // external tileset
+        if (!firstSpriteId) {
+            firstSpriteId = aSpriteSet.attr('firstgid');
+            imageFilename = imageFilename.substring(imageFilename.lastIndexOf('/') + 1);
+        }
+        var imagePath = map.directory + imageFilename;
         var imageWidth = aSpriteSet.find('image').attr("width");
         var imageHeight = aSpriteSet.find('image').attr("height");
         var sprites = map.getSprites(firstSpriteId, imageWidth, imageHeight, spriteWidth, spriteHeight);
+        console.log("imagePath, spriteWidth, spriteHeight, sprites |", imagePath, spriteWidth, spriteHeight, sprites);
         return {
             imagePath: imagePath,
             spriteWidth: spriteWidth,
@@ -121,7 +128,7 @@ Crafty.c("tiled", {
         var sprites = {};
         var numberOfColumns = imageWidth / spriteWidth;
         var numberOfRows = imageHeight / spriteHeight;
-        
+
         for (var row = 0; row < numberOfRows; row++) {
             for (var col = 0; col < numberOfColumns; col++) {
                 sprites[firstSpriteId] = [col, row];
