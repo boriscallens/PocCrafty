@@ -11,7 +11,6 @@ Crafty.c("tiled", {
         var map = this;
 
         $(Crafty).bind('onTmxLoaded', function (event, tmx) {
-            //console.log("onTmxLoaded", tmx);
             map.content = tmx;
             map.parseSprites();
             map.parseLayers();
@@ -80,13 +79,14 @@ Crafty.c("tiled", {
             var names = layer.find('data').text().replace(/[\r\n]+/gm, "").split(",");
             for (var row = 0; row < rows; row++) {
                 for (var col = 0; col < cols; col++) {
-                    //console.log("col, row, name", col, row, names[tileCounter]);
-                    var tile = {
-                        x: col,
-                        y: row,
-                        name: names[tileCounter]
-                    };
-                    map.tiles.push(tile);
+                    if (names[tileCounter] != '0') {
+                        var tile = {
+                            x: col,
+                            y: row,
+                            name: names[tileCounter]
+                        };
+                        map.tiles.push(tile);
+                    }
                     tileCounter++;
                 }
             }
@@ -108,15 +108,21 @@ Crafty.c("tiled", {
             firstSpriteId = aSpriteSet.attr('firstgid');
             imageFilename = imageFilename.substring(imageFilename.lastIndexOf('/') + 1);
         }
+        var offset = aSpriteSet.find('tileoffset');
+        var offsetX = offset.attr('x') || 0;
+        var offsetY = offset.attr('y') || 0;
+        
         var imagePath = map.directory + imageFilename;
         var imageWidth = aSpriteSet.find('image').attr("width");
         var imageHeight = aSpriteSet.find('image').attr("height");
         var sprites = map.getSprites(firstSpriteId, imageWidth, imageHeight, spriteWidth, spriteHeight);
-        console.log("imagePath, spriteWidth, spriteHeight, sprites |", imagePath, spriteWidth, spriteHeight, sprites);
+
         return {
             imagePath: imagePath,
             spriteWidth: spriteWidth,
             spriteHeight: spriteHeight,
+            marginX: offsetX,
+            marginY: offsetY,
             sprites: sprites
         };
     },
