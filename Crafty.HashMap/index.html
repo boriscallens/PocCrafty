@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <title>speed test</title>
+	  <script src="jslitmus.js"></script>
+	  <script src="original.js"></script>
+	  <script src="new.js"></script>
+	  <script>
+		// Test inits
+		var mapWithElements = new HashMap();
+		var newMapWithElements = new NewHashMap();
+		for (var x=1; x <= 768; x++) {
+			mapWithElements.insert({
+				_x : x*mapWithElements.cellsize,
+				_y : x*mapWithElements.cellsize,
+				_w : 64,
+				_h : 64
+			});
+			newMapWithElements.insert({
+				_x : x*newMapWithElements.cellsize,
+				_y : x*newMapWithElements.cellsize,
+				_w : 64,
+				_h : 64
+			});
+		};
+		
+		// Tests
+		JSLitmus.test("New Hashmap search", function (count) {
+			while(count--){		
+				newMapWithElements.search({
+					_x : count,
+					_y : count,
+					_w : 1,
+					_h : 1
+				});
+			};
+  	    });
+		JSLitmus.test("Old Hashmap search", function (count) {
+			while(count--){				
+				mapWithElements.search({
+					_x : count,
+					_y : count,
+					_w : 1,
+					_h : 1
+				});
+			};
+  	    });
+  	</script>	
+	  <script>
+  	/* Some other tests you might want to fix and check out
+		
+		// Test inits
+		var bigAssArray = [];
+		var mapWithElements = new HashMap();
+		for (var x=1; x <= 1e6; x++) {			
+			mapWithElements.insert({
+				_x : x,
+				_y : x,
+				_w : x,
+				_h : x,
+			});
+		};	
+		
+		JSLitmus.test("Old Hashmap constructor", function (count) {
+			while(count--){
+			  var testMap = new HashMap();
+			};
+		});		
+
+		JSLitmus.test("Old Hashmap insert", function (count) {
+			var map = new HashMap();
+			while(count--){
+			  map.insert(bigAssArray[count]);
+			};
+  	    });*/		
+	</script>
+	
+	</head>
+	<body style="margin: 0; padding: 0; overflow: hidden;"></body>
+</html>
