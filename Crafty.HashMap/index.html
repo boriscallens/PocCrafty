@@ -25,6 +25,36 @@
 		};
 		
 		// Tests
+		JSLitmus.test("New Hashmap insert", function (count) {
+			var map;
+			while(count--){		
+				map = new NewHashMap();
+				for (var x=1; x <= count; x++) {
+					map.insert({
+						_x : x*mapWithElements.cellsize,
+						_y : x*mapWithElements.cellsize,
+						_w : mapWithElements.cellsize,
+						_h : mapWithElements.cellsize
+					});
+				};
+			};
+  	    });
+		JSLitmus.test("Old Hashmap insert", function (count) {
+			var map;
+			while(count--){		
+				map = new HashMap();
+				for (var x=1; x <= count; x++) {
+					map.insert({
+						_x : x*mapWithElements.cellsize,
+						_y : x*mapWithElements.cellsize,
+						_w : mapWithElements.cellsize,
+						_h : mapWithElements.cellsize
+					});
+				};
+			};
+  	    });
+		
+		
 		JSLitmus.test("New Hashmap search", function (count) {
 			while(count--){		
 				newMapWithElements.search({
@@ -45,6 +75,18 @@
 				});
 			};
   	    });
+		
+		JSLitmus.test("New Hashmap boundaries", function (count) {
+			while(count--){		
+				newMapWithElements.boundaries();
+			};
+  	    });
+		JSLitmus.test("Old Hashmap boundaries", function (count) {
+			while(count--){				
+				mapWithElements.boundaries();
+			};
+  	    });
+		
   	</script>	
 	  <script>
   	/* Some other tests you might want to fix and check out

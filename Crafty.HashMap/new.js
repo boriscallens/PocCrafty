@@ -62,7 +62,7 @@ NewHashMap.prototype.search = function (rect, filter) {
 
     for (col = startCol; col <= endCol; col++) {
         currentCol = this.map[col];
-        if (!col) continue;
+        if (!currentCol) continue;
 
         startRow = Math.max(keys.y1, currentCol.minRow);
         endRow = Math.min(keys.y2, currentCol.maxRow);
@@ -78,9 +78,8 @@ NewHashMap.prototype.search = function (rect, filter) {
 
         for (i = 0, l = results.length; i < l; i++) {
             obj = results[i];
-            if (!obj) {
-                continue;
-            }
+            if (!obj) continue;
+
             id = obj[0];
             if (!found[id] && obj.x < rect._x + rect._w && obj._x + obj._w > rect._x && obj.y < rect._y + rect._h && obj._h + obj._y > rect._y) {
                 found[id] = results[i];
@@ -97,21 +96,22 @@ NewHashMap.prototype.search = function (rect, filter) {
 NewHashMap.prototype.boundaries = function () {
     var minX = 0, maxX = 0, minY = 0, maxY = 0;
     var entities, ent;
-    // take all the entities on the upper extremes
-    entities = this.map[this.map.maxCol][this.map.maxRow];
-    for (ent in entities) {
-        if (typeof ent == "object" && "requires" in ent) {
-            maxX = Math.max(maxX, ent.x + ent.w);
-            maxY = Math.max(maxY, ent.y + ent.h);
-        }
-    }
-    // take all the entities on the upper extremes
-    entities = this.map[this.map.minCol][this.map.minRow];
-    for (ent in entities) {
-        if (typeof ent == "object" && "requires" in ent) {
-            minX = Math.min(minX, ent.x + ent.w);
-            minY = Math.min(minY, ent.y + ent.h);
-        }
+    	
+	for (col = this.map.minCol; col <= this.map.maxCol; col++) {
+		currentCol = this.map[col];
+		if (!currentCol) continue;
+		
+		for (row = currentCol.minRow; row <= currentCol.maxRow; row++) {
+			currentRow = currentCol[row];
+			if (!currentRow) continue;
+			
+			for (ent in currentRow) {
+				if (typeof ent == "object" && "requires" in ent) {
+					maxX = Math.max(maxX, ent.x + ent.w);
+					maxY = Math.max(maxY, ent.y + ent.h);
+				}
+			}
+		}
     }
     return {
         max: {x: maxX, y: maxY},
