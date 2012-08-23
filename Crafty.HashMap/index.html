@@ -1,122 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-	  <title>speed test</title>
-	  <script src="jslitmus.js"></script>
-	  <script src="original.js"></script>
-	  <script src="new.js"></script>
-	  <script>
-		// Test inits
-		var mapWithElements = new HashMap();
-		var newMapWithElements = new NewHashMap();
-		for (var x=1; x <= 768; x++) {
-			mapWithElements.insert({
-				_x : x*mapWithElements.cellsize,
-				_y : x*mapWithElements.cellsize,
-				_w : 64,
-				_h : 64
-			});
-			newMapWithElements.insert({
-				_x : x*newMapWithElements.cellsize,
-				_y : x*newMapWithElements.cellsize,
-				_w : 64,
-				_h : 64
-			});
-		};
-		
-		// Tests
-		JSLitmus.test("New Hashmap insert", function (count) {
-			var map;
-			while(count--){		
-				map = new NewHashMap();
-				for (var x=1; x <= count; x++) {
-					map.insert({
-						_x : x*mapWithElements.cellsize,
-						_y : x*mapWithElements.cellsize,
-						_w : mapWithElements.cellsize,
-						_h : mapWithElements.cellsize
-					});
-				};
-			};
-  	    });
-		JSLitmus.test("Old Hashmap insert", function (count) {
-			var map;
-			while(count--){		
-				map = new HashMap();
-				for (var x=1; x <= count; x++) {
-					map.insert({
-						_x : x*mapWithElements.cellsize,
-						_y : x*mapWithElements.cellsize,
-						_w : mapWithElements.cellsize,
-						_h : mapWithElements.cellsize
-					});
-				};
-			};
-  	    });
-		
-		
-		JSLitmus.test("New Hashmap search", function (count) {
-			while(count--){		
-				newMapWithElements.search({
-					_x : count,
-					_y : count,
-					_w : 1,
-					_h : 1
-				});
-			};
-  	    });
-		JSLitmus.test("Old Hashmap search", function (count) {
-			while(count--){				
-				mapWithElements.search({
-					_x : count,
-					_y : count,
-					_w : 1,
-					_h : 1
-				});
-			};
-  	    });
-		
-		JSLitmus.test("New Hashmap boundaries", function (count) {
-			while(count--){		
-				newMapWithElements.boundaries();
-			};
-  	    });
-		JSLitmus.test("Old Hashmap boundaries", function (count) {
-			while(count--){				
-				mapWithElements.boundaries();
-			};
-  	    });
-		
-  	</script>	
-	  <script>
-  	/* Some other tests you might want to fix and check out
-		
-		// Test inits
-		var bigAssArray = [];
-		var mapWithElements = new HashMap();
-		for (var x=1; x <= 1e6; x++) {			
-			mapWithElements.insert({
-				_x : x,
-				_y : x,
-				_w : x,
-				_h : x,
-			});
-		};	
-		
-		JSLitmus.test("Old Hashmap constructor", function (count) {
-			while(count--){
-			  var testMap = new HashMap();
-			};
-		});		
-
-		JSLitmus.test("Old Hashmap insert", function (count) {
-			var map = new HashMap();
-			while(count--){
-			  map.insert(bigAssArray[count]);
-			};
-  	    });*/		
-	</script>
-	
-	</head>
-	<body style="margin: 0; padding: 0; overflow: hidden;"></body>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>Not-Atomic Tests = Bad</title>
+	<link rel="stylesheet" href="qunit.css" type="text/css">
+	<script src="qunit.js"></script>
+	<script src="jquery.js"></script>
+	<script src="new.js"></script>
+	<script src="qunit-tests.js"></script>
+</head>
+<body>
+  <h1 id="qunit-header">Not-Atomic Tests = Bad</h1>
+  <h2 id="qunit-banner"></h2>
+  <div id="qunit-testrunner-toolbar"></div>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
+  <div id="qunit-fixture"></div>
+</body>
 </html>

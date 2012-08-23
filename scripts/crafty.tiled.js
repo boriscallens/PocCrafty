@@ -25,6 +25,7 @@ Crafty.c("tiled", {
         $(Crafty).bind('onMapLoaded', function () {
             // if all tilesets and layers are loaded
             if (map.tilesetsLeftToParse <= 0 && map.layersLeftToParse <= 0) {
+                //map.filterSprites();
                 callback();
             }
         });
@@ -111,7 +112,7 @@ Crafty.c("tiled", {
         var offset = aSpriteSet.find('tileoffset');
         var offsetX = offset.attr('x') || 0;
         var offsetY = offset.attr('y') || 0;
-        
+
         var imagePath = map.directory + imageFilename;
         var imageWidth = aSpriteSet.find('image').attr("width");
         var imageHeight = aSpriteSet.find('image').attr("height");
@@ -142,5 +143,21 @@ Crafty.c("tiled", {
             }
         }
         return sprites;
+    },
+    filterSprites: function () {
+        var map = this;
+        var usedSpriteNames = [];
+        for (var tileCounter = 0; tileCounter < map.tiles.length; tileCounter++) {
+            usedSpriteNames.push(map.tiles[tileCounter].name);
+        }
+
+        for (var i = 0; i < map.sprites.length; i++) {
+            var _sprites = map.sprites[i].sprites;
+            for (var spriteName in _sprites) {
+                if (usedSpriteNames.indexOf(spriteName) == -1) {
+                    delete map.sprites[i].sprites[spriteName];
+                }
+            }
+        }
     }
 });

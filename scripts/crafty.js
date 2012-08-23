@@ -555,183 +555,194 @@
             })
         }
     });
-    k.Crafty = r
+    k.Crafty = r;
 })(window);
 (function (Crafty, window, document) {
     (function (parent) {
-        var cellsize, HashMap = function (cell) {
-            cellsize = cell || 64;
-            this.map = {}
-        }, SPACE = " ";
+        function HashMap(cell) {
+			this.cellsize = cell || 64;
+            this.maxCol= 1;
+            this.minCol= 1;
+            this.map = {};
+            this.maxX = 0;
+            this.maxY = 0;
+            this.minX = 0;
+            this.minY = 0;
+		};
+        SPACE = " ";
         HashMap.prototype = {
-            insert: function (obj) {
-                var keys = HashMap.key(obj), entry = new Entry(keys, obj, this), i = 0, j, hash;
-                for (i = keys.x1; i <= keys.x2; i++) {
-                    for (j = keys.y1; j <= keys.y2; j++) {
-                        hash = i + SPACE + j;
-                        if (!this.map[hash]) {
-                            this.map[hash] = []
-                        }
-                        this.map[hash].push(obj)
-                    }
+            key: function (obj) {
+                if (obj.hasOwnProperty("mbr")) {
+                    obj = obj.mbr();
                 }
-                return entry
+                return {
+                    x1: Math.floor(obj._x / this.cellsize),
+                    y1: Math.floor(obj._y / this.cellsize),
+                    x2: Math.floor((obj._w + obj._x) / this.cellsize),
+                    y2: Math.floor((obj._h + obj._y) / this.cellsize)
+                };
+            },
+            insert: function (obj) {
+				var keys = this.key(obj);
+				var entry = new Entry(keys, obj, this);
+                var col, row, currentCol, currentRow;
+                this.minCol = Math.min(this.minCol, keys.x1);
+                this.maxCol = Math.max(this.maxCol, keys.x2);
+                
+                for (col = keys.x1; col <= keys.x2; col++) {
+					currentCol = this.map[col];
+					if (!currentCol) {
+					    currentCol = { minRow: keys.y1, maxRow: keys.y2 };
+					    this.map[col] = currentCol;
+					} else {
+					    currentCol.minRow = Math.min(currentCol.minRow, keys.y1);
+					    currentCol.maxRow = Math.max(currentCol.maxRow, keys.y2);    
+					}
+					
+					for (row = keys.y1; row <= keys.y2; row++) {
+						currentRow = currentCol[row];
+						if (!currentRow) {
+						    currentRow = [];
+						    this.map[col][row] = currentRow;
+						}
+					    currentRow.push(entry);
+					    this.maxX = Math.max(this.maxX, obj._x+obj._w);
+                        this.maxY = Math.max(this.maxY, obj._y+obj._h);
+                        this.minX = Math.min(this.minX, obj._x);
+                        this.minY = Math.min(this.minY, obj._y);
+					}
+				}
+                return entry;
             },
             search: function (rect, filter) {
-                var keys = HashMap.key(rect), i, j, hash, results = [];
-                if (filter === undefined) {
-                    filter = true
-                }
-                for (i = keys.x1; i <= keys.x2; i++) {
-                    for (j = keys.y1; j <= keys.y2; j++) {
-                        hash = i + SPACE + j;
-                        if (this.map[hash]) {
-                            results = results.concat(this.map[hash])
-                        }
-                    }
-                }
-                if (filter) {
-                    var obj, id, finalresult = [], found = {};
+                var results = [];
+				var keys = this.key(rect);
+				var startCol = Math.max(keys.x1, this.minCol);
+				var endCol = Math.min(keys.x2, this.maxCol);
+				var currentCol, currentRow, startRow, endRow, col, row;
 
-                    for (i = 0, l = results.length; i < l; i++) {
-                        obj = results[i];
-                        if (!obj) {
-                            continue
-                        }
-                        id = obj[0];
-                        if (!found[id] && obj.x < rect._x + rect._w && obj._x + obj._w > rect._x && obj.y < rect._y + rect._h && obj._h + obj._y > rect._y) {
-                            found[id] = results[i]
-                        }
-                    }
-                    for (obj in found) {
-                        finalresult.push(found[obj])
-                    }
-                    return finalresult
-                } else {
-                    return results
-                }
+				if (filter === undefined) {
+					filter = true;
+				}
+
+				for (col = startCol; col <= endCol; col++) {
+					currentCol = this.map[col];
+					if (!col) continue;
+
+					startRow = Math.max(keys.y1, currentCol.minRow);
+					endRow = Math.min(keys.y2, currentCol.maxRow);
+					for (row = startRow; row <= endRow; row++) {
+						currentRow = currentCol[row];
+						if (currentRow) {
+							results = results.concat(currentRow);
+						}
+					}
+				}
+				if (filter) {
+					var i, l, obj, id, finalresult = [], found = {};
+
+					for (i = 0, l = results.length; i < l; i++) {
+						obj = results[i];
+						if (!obj) {
+							continue;
+						}
+						id = obj[0];
+						if (!found[id] && obj.x < rect._x + rect._w && obj._x + obj._w > rect._x && obj.y < rect._y + rect._h && obj._h + obj._y > rect._y) {
+							found[id] = results[i];
+						}
+					}
+					for (obj in found) {
+						finalresult.push(found[obj]);
+					}
+					return finalresult;
+				} else {
+					return results;
+				}
             },
             remove: function (keys, obj) {
-                var i = 0, j, hash;
-                if (arguments.length == 1) {
-                    obj = keys;
-                    keys = HashMap.key(obj)
-                }
-                for (i = keys.x1; i <= keys.x2; i++) {
-                    for (j = keys.y1; j <= keys.y2; j++) {
-                        hash = i + SPACE + j;
-                        if (this.map[hash]) {
-                            var cell = this.map[hash], m, n = cell.length;
-                            for (m = 0; m < n; m++) {
-                                if (cell[m] && cell[m][0] === obj[0]) {
-                                    cell.splice(m, 1)
-                                }
-                            }
-                        }
-                    }
-                }
+				var currentCol, currentRow, len, col, row, cell;
+				var myMap = this.map
+				if (arguments.length == 1) {
+					obj = keys;
+					keys = HashMap.key(obj);
+				}
+				for (col = keys.x1; col <= keys.x2; col++) {
+					currentCol = this.map[col];
+					if (!currentCol) continue;
+
+					for (row = keys.y1; row <= keys.y2; row++) {
+						currentRow = currentCol[row];
+						if (!currentRow) continue;
+
+						len = currentRow.length;
+						for (cell = len-1; cell >= 0; cell--) {
+							if (currentRow[cell] && currentRow[cell].obj[0] === obj[0]) {
+								currentRow.splice(cell, 1);
+							}
+						}
+					}
+					 //recalculate minrow and maxrow
+					var keys = Object.keys(currentCol).map(Number).filter(function(a){
+						return isFinite(a) && currentCol[a] && currentCol[a].len > 0;
+					});
+					currentCol.minRow = Math.min.apply(Math, keys);
+					currentCol.maxRow = Math.max.apply(Math, keys);
+				}
+				var keys = Object.keys(myMap).map(Number);
+				keys = keys.filter(function(a){
+						return isFinite(a) && myMap[a] && isFinite(myMap[a].minRow);
+				});
+				
+				this.minCol = Math.min.apply(Math, keys);
+				this.maxCol = Math.max.apply(Math, keys);
             },
             boundaries: function () {
-                var k, ent, hash = {
-                    max: {
-                        x: -Infinity,
-                        y: -Infinity
-                    },
-                    min: {
-                        x: Infinity,
-                        y: Infinity
-                    }
-                }, coords = {
-                    max: {
-                        x: -Infinity,
-                        y: -Infinity
-                    },
-                    min: {
-                        x: Infinity,
-                        y: Infinity
-                    }
-                };
-
-                for (var h in this.map) {
-                    if (!this.map[h].length) {
-                        continue
-                    }
-                    var map_coord = h.split(SPACE), i = map_coord[0], j = map_coord[0];
-                    if (i >= hash.max.x) {
-                        hash.max.x = i;
-                        for (k in this.map[h]) {
-                            ent = this.map[h][k];
-                            if (typeof ent == "object" && "requires" in ent) {
-                                coords.max.x = Math.max(coords.max.x, ent.x + ent.w)
-                            }
-                        }
-                    }
-                    if (i <= hash.min.x) {
-                        hash.min.x = i;
-                        for (k in this.map[h]) {
-                            ent = this.map[h][k];
-                            if (typeof ent == "object" && "requires" in ent) {
-                                coords.min.x = Math.min(coords.min.x, ent.x)
-                            }
-                        }
-                    }
-                    if (j >= hash.max.y) {
-                        hash.max.y = j;
-                        for (k in this.map[h]) {
-                            ent = this.map[h][k];
-                            if (typeof ent == "object" && "requires" in ent) {
-                                coords.max.y = Math.max(coords.max.y, ent.y + ent.h)
-                            }
-                        }
-                    }
-                    if (j <= hash.min.y) {
-                        hash.min.y = j;
-                        for (k in this.map[h]) {
-                            ent = this.map[h][k];
-                            if (typeof ent == "object" && "requires" in ent) {
-                                coords.min.y = Math.min(coords.min.y, ent.y)
-                            }
-                        }
-                    }
+                var minX = 0, maxX = 0, minY = 0, maxY = 0;
+                var ent, col, row, currentCol, currentRow;
+                //console.log(this);
+	            for (col = this.minCol; col <= this.maxCol; col++) {
+		            currentCol = this.map[col];
+		            if (!currentCol) continue;
+		
+		            for (row = currentCol.minRow; row <= currentCol.maxRow; row++) {
+			            currentRow = currentCol[row];
+			            if (!currentRow) continue;
+			
+			            for (ent in currentRow) {
+				            if (typeof ent == "object" && "requires" in ent) {
+					            maxX = Math.max(maxX, ent.x + ent.w);
+					            maxY = Math.max(maxY, ent.y + ent.h);
+				            }
+			            }
+		            }
                 }
-                return coords
+                return {
+                    max: {x: maxX, y: maxY},
+                    min: {x: minX, y: minY}
+                };
             }
         };
-
-        HashMap.key = function (obj) {
-            if (obj.hasOwnProperty("mbr")) {
-                obj = obj.mbr()
-            }
-            var x1 = Math.floor(obj._x / cellsize), y1 = Math.floor(obj._y / cellsize), x2 = Math.floor((obj._w + obj._x) / cellsize), y2 = Math.floor((obj._h + obj._y) / cellsize);
-            return {
-                x1: x1,
-                y1: y1,
-                x2: x2,
-                y2: y2
-            }
-        };
-
         HashMap.hash = function (keys) {
-            return keys.x1 + SPACE + keys.y1 + SPACE + keys.x2 + SPACE + keys.y2
+            return [keys.x1, keys.y1, keys.x2, keys.y2].join(SPACE);
         };
 
-        function Entry(keys, obj, map) {
+        function Entry (keys, obj, map) {
             this.keys = keys;
             this.map = map;
-            this.obj = obj
+            this.obj = obj;
         }
         Entry.prototype = {
             update: function (rect) {
-                if (HashMap.hash(HashMap.key(rect)) != HashMap.hash(this.keys)) {
+               if (HashMap.hash(HashMap.prototype.key(rect)) != HashMap.hash(this.keys)) {
                     this.map.remove(this.keys, this.obj);
                     var e = this.map.insert(this.obj);
-                    this.keys = e.keys
-                }
+                    this.keys = e.keys;
+               }
             }
         };
-
-        parent.HashMap = HashMap
+        parent.HashMap = HashMap;
     })(Crafty);
+    
     Crafty.map = new Crafty.HashMap();
     var M = Math, Mc = M.cos, Ms = M.sin, PI = M.PI, DEG_TO_RAD = PI / 180;
     Crafty.c("2D", {
