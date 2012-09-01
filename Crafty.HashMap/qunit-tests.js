@@ -157,7 +157,7 @@ test("map.search without filter should only return result at searched location",
 	equal(searchResult[1].obj, entity3);
 	equal(searchResult[2].obj, entity2);
 });
-/*// Don't really get what the filter function is for
+// Don't really get what the filter function is for
 // TODO: what?
 // test("map.search with filter should only return objects at location that pass through the filter", function(){
 	// var myMap = new NewHashMap();
@@ -177,13 +177,13 @@ test("map.search without filter should only return result at searched location",
 	// var searchResult = myMap.search(rect, entity2)
 	// equal(searchResult.length, 1);
 	// equal(searchResult[0].obj, entity2);
-// });*/
-test("boundaries should correctly give boundaries", function(){
+// });
+test("boundaries for one entity should correctly give boundaries", function(){
 	var myMap = new NewHashMap();
 		
 	var entity1 = {_x:1, _y:1, _w:1, _h:1}
 	var expected = {
-        max: {x: 1, y: 1},
+        max: {x: 2, y: 2},
         min: {x: 1, y: 1}
     };
 	
@@ -191,15 +191,15 @@ test("boundaries should correctly give boundaries", function(){
 	var boundaries = myMap.boundaries();
 		
 	deepEqual(expected, boundaries);
-})
+});
 
-test("boundaries should correctly give boundaries", function(){
+test("boundaries for two entities should correctly give boundaries", function(){
 	var myMap = new NewHashMap();
 			
 	var entity1 = {_x:1, _y:1, _w:1, _h:1}
 	var entity2 = {_x:1234, _y:1, _w:1, _h:1}
 	var expected = {
-        max: {x: 1234, y: 1},
+        max: {x: 1235, y: 2},
         min: {x: 1, y: 1}
     };
 	
@@ -208,4 +208,4 @@ test("boundaries should correctly give boundaries", function(){
 	var boundaries = myMap.boundaries();
 		
 	deepEqual(expected, boundaries);
-})
+});

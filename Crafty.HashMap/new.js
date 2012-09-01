@@ -1,7 +1,8 @@
 function NewHashMap(cell){
     this.map = {};
+	this.maxInt = 9007199254740992; //about int.max
     this.cellsize = cell || 64;
-    this.minCol = 9007199254740992; //about int.max
+    this.minCol = this.maxInt;
     this.maxCol = 1;
 };
 NewHashMap.prototype.insert = function (obj) {
@@ -104,26 +105,25 @@ NewHashMap.prototype.search = function (rect, filter) {
     
 };
 NewHashMap.prototype.boundaries = function () {
-    var minX = 0, maxX = 0, minY = 0, maxY = 0;
+    var minX = this.maxInt, maxX = 0, minY = this.maxInt, maxY = 0;
     var entities, ent, col, row, currentCol, currentRow, index;
-        
+    
     for (col = this.minCol; col <= this.maxCol; col++) {
         currentCol = this.map[col];
         if (!currentCol) continue;
-        
+		
         for (row = currentCol.minRow; row <= currentCol.maxRow; row++) {
             currentRow = currentCol[row];
             if (!currentRow) continue;
-            
-            var min = Math.min.apply
-			this.minCol = Math.min.apply(Math, keys);
-    this.maxCol = Math.max.apply(Math, keys);
-			
+            			
 			for (ent in currentRow) {
-                if (typeof ent == "object" && "requires" in ent) {
-                    maxX = Math.max(maxX, ent.x + ent.w);
-                    maxY = Math.max(maxY, ent.y + ent.h);
-                }
+                if (typeof currentRow[ent] == "object" /*&& "requires" in ent*/) {
+                    maxX = Math.max(maxX, currentRow[ent].obj._x + currentRow[ent].obj._w);
+                    maxY = Math.max(maxY, currentRow[ent].obj._y + currentRow[ent].obj._h);
+
+                    minX = Math.min(minX, currentRow[ent].obj._x);
+                    minY = Math.min(minY, currentRow[ent].obj._y);
+				}
             }
         }
     }
