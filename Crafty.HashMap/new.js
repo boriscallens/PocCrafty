@@ -7,7 +7,20 @@ function NewHashMap(cell){
 	this.maxX = - Infinity;
 	this.minY = Infinity;
 	this.maxY = - Infinity
+	this.entries = [];
 };
+NewHashMap.prototype.key = function (obj) {
+	if (obj.hasOwnProperty("mbr")) {
+		obj = obj.mbr();
+	}
+	return {
+		x1: Math.floor(obj._x / this.cellsize),
+		y1: Math.floor(obj._y / this.cellsize),
+		x2: Math.floor((obj._w + obj._x) / this.cellsize),
+		y2: Math.floor((obj._h + obj._y) / this.cellsize)
+	};
+};
+
 NewHashMap.prototype.insert = function (obj) {
 	var keys = this.key(obj);
 	var entry = new Entry(keys, obj, this);
@@ -18,8 +31,10 @@ NewHashMap.prototype.insert = function (obj) {
 	this.maxX = Math.max(this.maxX, obj._x + obj._w);
 	this.maxY = Math.max(this.maxY, obj._y + obj._h);
 	
-	var col, row;
+	this.entries.push(entry);
 	
+	//TODO: fase all this shit out
+	var col, row;	
 	for (col = keys.x1; col <= keys.x2; col++) {
 		var currentCol = this.map[col];
 		if (!currentCol) this.map[col] = currentCol = { minRow: keys.y1, maxRow: keys.y2 };
@@ -32,15 +47,46 @@ NewHashMap.prototype.insert = function (obj) {
 			if (!currentRow) currentCol[row] = [];
 			this.map[col][row].push(entry);
 		}
-	}
+	}	
 };
+
+NewHashMap.prototype.isContainedBy = function(entry, keys){
+	return (
+		entry.keys.x1 >= keys.x1 &&
+		entry.keys.x2 <= keys.x2 &&
+		entry.keys.y1 >= keys.y1 &&
+		entry.keys.y2 <= keys.y2
+	);
+};
+
 NewHashMap.prototype.remove = function (keys, obj) {
-	var currentCol, currentRow, len, col, row, cell;
-	var myMap = this.map
+	// optional argument handling
 	if (arguments.length == 1){
 		obj = keys;
 		keys = this.key(obj);
 	}
+	
+	var me = this;
+	me.entries = me.entries.filter(function(entry){
+		return me.isContainedBy(entry, keys) && entry.obj !== obj;
+	});
+	var allX = [];
+	var allY = [];
+	for (var i = 0; i <= me.entries.length-1; i++){
+		allX.push(me.entries[i].keys.x1);
+		allX.push(me.entries[i].keys.x2);
+		allY.push(me.entries[i].keys.y1);
+		allY.push(me.entries[i].keys.y2);
+	}
+	this.minX = Math.min.apply(Math, allX);
+	this.maxX = Math.max.apply(Math, allX);
+	this.minY = Math.min.apply(Math, allY);
+	this.maxY = Math.max.apply(Math, allY);
+	
+	//TODO: fase all this shit out
+	var currentCol, currentRow, len, col, row, cell;
+	var myMap = this.map
+	
 	for (col = keys.x1; col <= keys.x2; col++) {
 		currentCol = myMap[col];
 		if (!currentCol) continue;
@@ -74,13 +120,23 @@ NewHashMap.prototype.remove = function (keys, obj) {
 	this.maxCol = Math.max.apply(Math, keys);
 };
 NewHashMap.prototype.search = function (rect, filter) {
+	//Optional parameter handling
+	if (filter === undefined) filter = true;
+	
+	var me = this;
+	var found = me.entries.filter(function(entry){
+		return me.isContainedBy(entry, keys);
+	});
+	if (!filter){return results}
+	
+	//TODO: filter and phase old shit out
 	var results = [];
 	var currentCol, currentRow, startRow, endRow, col, row;
 	var keys = this.key(rect);
 	var startCol = Math.max(keys.x1, this.minCol);
 	var endCol = Math.min(keys.x2, this.maxCol);
-
-	if (filter === undefined) filter = true;
+	
+	
 
 	for (col = startCol; col <= endCol; col++) {
 		currentCol = this.map[col];
@@ -120,17 +176,7 @@ NewHashMap.prototype.boundaries = function () {
 		min: {x: this.minX, y: this.minY}
 	};
 };
-NewHashMap.prototype.key = function (obj) {
-	if (obj.hasOwnProperty("mbr")) {
-		obj = obj.mbr();
-	}
-	return {
-		x1: Math.floor(obj._x / this.cellsize),
-		y1: Math.floor(obj._y / this.cellsize),
-		x2: Math.floor((obj._w + obj._x) / this.cellsize),
-		y2: Math.floor((obj._h + obj._y) / this.cellsize)
-	};
-};
+
 
 function Entry(keys, obj, map) {
 	this.keys = keys;

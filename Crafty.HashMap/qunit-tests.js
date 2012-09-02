@@ -1,4 +1,4 @@
-test("map.insert one entity with x, y, w and h = 1 should insert it at 0,0",1 , function(){
+/*test("map.insert one entity with x, y, w and h = 1 should insert it at 0,0",1 , function(){
 	var myMap = new NewHashMap();
 	var entity = {_x:1, _y:1, _w:1, _h:1}
 	myMap.insert(entity);
@@ -91,7 +91,7 @@ test("map.insert should correctly update maxRow", 3, function(){
 	var entity = {_x:1, _y:size*1, _w:1, _h:1}
 	myMap.insert(entity);
 	equal(myMap.map[0].maxRow, 3);
-});
+});*/
 test("map.remove should correctly remove the entry", 2, function(){
 	var myMap = new NewHashMap();
 	var entity = {_x:1, _y:1, _w:1, _h:1}
@@ -101,7 +101,7 @@ test("map.remove should correctly remove the entry", 2, function(){
 	myMap.remove(entity);
 	equal(myMap.map[0][0][0], undefined);
 });
-test("map.remove should remove the entry at all the right depth", 6, function(){
+/*test("map.remove should remove the entry at all the right depth", 6, function(){
 	var myMap = new NewHashMap();
 	var size = myMap.cellsize
 	var entity = {_x:1, _y:1, _w:1, _h:1}
@@ -193,7 +193,7 @@ test("boundaries for one entity should correctly give boundaries", function(){
 	deepEqual(boundaries, expected);
 });
 
-/*test("boundaries for two entities should correctly give boundaries", function(){
+test("boundaries for two entities should correctly give boundaries", function(){
 	var myMap = new NewHashMap();
 			
 	var entity1 = {_x:1, _y:1, _w:1, _h:1}
