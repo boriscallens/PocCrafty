@@ -96,10 +96,10 @@ test("map.remove should correctly remove the entry", 2, function(){
 	var myMap = new NewHashMap();
 	var entity = {_x:1, _y:1, _w:1, _h:1}
 	myMap.insert(entity);
-	equal(myMap.map[0][0][0].obj, entity);
+	equal(myMap.entries[0].obj, entity);
 	
 	myMap.remove(entity);
-	equal(myMap.map[0][0][0], undefined);
+	equal(myMap.map[0], undefined);
 });
 /*test("map.remove should remove the entry at all the right depth", 6, function(){
 	var myMap = new NewHashMap();
@@ -135,7 +135,7 @@ test("map.remove should correctly update mincol", 3, function(){
 	
 	myMap.remove(entity1);
 	equal(myMap.minCol, 4);
-});
+});*/
 test("map.search without filter should only return result at searched location", function(){
 	var myMap = new NewHashMap();
 	var size = myMap.cellsize;
@@ -156,7 +156,7 @@ test("map.search without filter should only return result at searched location",
 	equal(searchResult[0].obj, entity1);
 	equal(searchResult[1].obj, entity3);
 	equal(searchResult[2].obj, entity2);
-});
+});/*
 // Don't really get what the filter function is for
 // TODO: what?
 // test("map.search with filter should only return objects at location that pass through the filter", function(){
